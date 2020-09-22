@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Layout from "../core/Layout";
 import {isAuthenticated} from "../auth";
-import {createProduct} from "./apiAdmin";
+import {createProduct, getCategories} from "./apiAdmin";
 
 
 const AddProduct = () => {
@@ -19,7 +19,7 @@ const AddProduct = () => {
         photo: '',
         loading: false,
         error: '',
-        createdProductName: '',
+        createdProduct: '',
         redirectToProfile: false,
         formData: ''
     })
@@ -35,13 +35,24 @@ const AddProduct = () => {
         photo,
         loading,
         error,
-        createdProductName,
+        createdProduct,
         redirectToProfile,
         formData
     } = values
 
+    // Load categories and set form data
+    const init = () => {
+        getCategories().then(categories => {
+            if(categories.error) {
+                setValues({...values, error: categories.error})
+            } else {
+                setValues({...values, categories: categories, formData: new FormData()})
+            }
+        })
+    }
+
     useEffect(() => {
-        setValues({...values, formData: new FormData()})
+        init()
     }, [])
 
     const handleChange = name => event => {
@@ -67,23 +78,35 @@ const AddProduct = () => {
                         photo: '',
                         quantity: '',
                         loading: false,
-                        createdProductName: response.name
+                        createdProduct: response.name
                     })
                 }
             })
 
     }
-    //
-    // const showSuccess = () => {
-    //     if(success) {
-    //         return <h6 className='text-success'>Category {categoryName} Created</h6>
-    //     }
-    // }
-    // const showError = () => {
-    //     if(!success) {
-    //         return <h6 className='text-danger'>Category name should be unique</h6>
-    //     }
-    // }
+
+
+    const showSuccess = () => {
+        return (
+            <div className='alert alert-info' style={{display: createdProduct ? '' : 'none'}}>
+                <h2>{`${createdProduct} is created`}</h2>
+            </div>
+
+        )
+    }
+    const showError = () => {
+            return (
+                <div className='alert alert-danger' style={{display: error ? '' : 'none'}}>
+                    {error}
+                </div>
+
+                    )
+    }
+    const showLoading = () => {
+        return (
+            loading && (<div className='alert alert-info'><h2>Loading...</h2></div>)
+        )
+    }
 
     const newProductForm = () => {
         return (
@@ -97,27 +120,27 @@ const AddProduct = () => {
                     </div>
                     <div className="form-group">
                         <label className="text-muted" >Name</label>
-                        <input type="text" className='form-control' onChange={handleChange('name')} value={name} required  />
+                        <input type="text" className='form-control' onChange={handleChange('name')} value={name}   />
                     </div>
                     <div className="form-group">
                         <label className="text-muted" >Description</label>
-                        <textarea onChange={handleChange('description')} type="text" className='form-control' value={description} required  />
+                        <textarea onChange={handleChange('description')} type="text" className='form-control' value={description}   />
                     </div>
                     <div className="form-group">
                         <label className="text-muted" >Price</label>
-                        <input type="text" className='form-control' onChange={handleChange('price')} value={price} required  />
+                        <input type="text" className='form-control' onChange={handleChange('price')} value={price}   />
                     </div>
                     <div className="form-group">
                         <label className="text-muted">Product category</label>
                         <select onChange={handleChange('category')} className="form-control">
-                            <option value="5f65cf6984b52306d02a62a7">JS</option>
-                            <option value="5f65cf6984b52306d02a62a7">PHP</option>
+                            <option>Please select option</option>
+                            {categories && categories.map((category, index) =>( <option key={index} value={category._id}>{category.name}</option>))}
                         </select>
-
                     </div>
                     <div className="form-group">
                         <label className="text-muted">Shipping</label>
                         <select onChange={handleChange('shipping')} className="form-control">
+                            <option>Please select option</option>
                             <option value="0">NO</option>
                             <option value="1">YES</option>
                         </select>
@@ -125,7 +148,7 @@ const AddProduct = () => {
                     </div>
                     <div className="form-group">
                         <label className="text-muted" >Quantity</label>
-                        <input type="text" className='form-control' onChange={handleChange('quantity')} value={quantity} required  />
+                        <input type="text" className='form-control' onChange={handleChange('quantity')} value={quantity}   />
                     </div>
                     <button className="btn btn-primary">Create product</button>
                 </form>
@@ -138,9 +161,9 @@ const AddProduct = () => {
         <Layout title='Add a new product' description={`${user.name} dashboard.`} className='container'>
             <div className="row">
                 <div className="col-md-8 offset-md-2">
-                    {/*{showError()}*/}
-                    {/*{showSuccess()}*/}
-                    {newProductForm()}
+                    {showError()}
+                    {showSuccess()}
+                    {loading  ?showError() : newProductForm()}
                 </div>
             </div>
 
