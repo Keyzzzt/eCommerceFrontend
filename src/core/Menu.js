@@ -1,6 +1,7 @@
 import React from "react";
 import {Link, withRouter} from 'react-router-dom'
 import {isAuthenticated, signout} from "../auth/index";
+import {totalProductsInCart} from "./cartHelpers";
 
 const isActive = (history, path) => {
     if(history.location.pathname === path) {
@@ -20,6 +21,9 @@ const Menu = ({history}) => {
                 </li>
                 <li className="nav-item">
                     <Link className='nav-link' to='/shop' style={isActive(history, '/shop')}>Shop</Link>
+                </li>
+                <li className="nav-item">
+                    <Link className='nav-link' to='/cart' style={isActive(history, '/cart')}>Cart <sup><small className='cart-badge'>{totalProductsInCart()}</small></sup></Link>
                 </li>
                 {isAuthenticated() && isAuthenticated().user.role === 0 && (
                     <li className="nav-item">
@@ -48,7 +52,6 @@ const Menu = ({history}) => {
                         history.push('/')
                     })} style={{color: '#fff', cursor: 'pointer'}}>Signout</span>
                         </li>
-
                     </>
                 )}
             </ul>

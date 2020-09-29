@@ -39,12 +39,22 @@ const Home = () => {
             <Search />
             <h2 className="mb-4">Best sellers</h2>
             <div className="row">
-                {productsBySell.map((product, index) => (<Card key={index} product={product} />) )}
+
+                {productsBySell.map((product, index) => (
+                    <div className='col-4 mb3'>
+                        <Card key={index} product={product} />
+                    </div>
+
+                ))}
             </div>
             <hr/>
             <h2 className="mb-4">Newest</h2>
             <div className="row">
-                {productsByArrival.map((product, index) => (<Card key={index} product={product} />) )}
+                {productsByArrival.map((product, index) => (
+                    <div className='col-4 mb3'>
+                        <Card key={index} product={product} />
+                    </div>
+                ))}
 
             </div>
         </Layout>
